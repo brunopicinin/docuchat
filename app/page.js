@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { getChatCompletion } from '@/lib/openai';
 import { detectTextInImage } from '@/lib/roboflow';
 import { CornerDownLeft } from "lucide-react";
 import { useEffect, useState } from 'react';
@@ -26,15 +27,14 @@ export default function Home() {
     }
   }
 
-  function handleSend(event) {
+  async function handleSend(event) {
     event.preventDefault();
     if (input.trim()) {
-      const newMessages = [...messages, { text: input, sender: 'user' }];
+      const newMessages = [...messages, { role: 'user', content: input }];
       setMessages(newMessages);
-      setTimeout(() => {
-        setMessages([...newMessages, { text: 'AI response', sender: 'assistant' }]);
-      }, 500);
       setInput('');
+      const message = await getChatCompletion(newMessages);
+      setMessages([...newMessages, { role: 'assistant', content: message.content }]);
     }
   }
 
@@ -50,9 +50,9 @@ export default function Home() {
         try {
           const text = await detectTextInImage(base64String);
           if (text) {
-            setMessages([...messages, { text: `There you go! Here's the text from the image:\n\n${text}`, sender: 'assistant' }]);
+            setMessages([...messages, { role: 'assistant', content: `There you go! Here's the text from the image:\n\n${text}` }]);
           } else {
-            setMessages([...messages, { text: 'No text found in the image. You can try refreshing the page and selecting a different image.', sender: 'assistant' }]);
+            setMessages([...messages, { role: 'assistant', content: 'No text found in the image. You can try refreshing the page and selecting a different image.' }]);
           }
         } catch (error) {
           alert(`Error: ${error.message}`);
@@ -101,9 +101,9 @@ export default function Home() {
             {/* chat messages */}
             <div className="flex-1 overflow-y-auto">
               {messages.map((message, index) => (
-                <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} pt-4`}>
-                  <div className={`rounded-md text-sm ${message.sender === 'user' ? 'bg-popover text-popover-foreground shadow' : ''} max-w-[80%] px-4 py-2 mt-2`}>
-                    <span dangerouslySetInnerHTML={{ __html: message.text.replace(/\n/g, '<br />') }} />
+                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} pt-4`}>
+                  <div className={`rounded-md text-sm ${message.role === 'user' ? 'bg-popover text-popover-foreground shadow' : ''} max-w-[80%] px-4 py-2 mt-2`}>
+                    <span dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br />') }} />
                   </div>
                 </div>
               ))}
