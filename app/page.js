@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { detectTextInImage } from '@/lib/roboflow';
 import { CornerDownLeft } from "lucide-react";
 import { useEffect, useState } from 'react';
 
@@ -10,19 +11,7 @@ function scrollToBottom() {
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState([
-    { text: 'Hello! How can I help you today?', sender: 'assistant' },
-    { text: 'What is this document about?', sender: 'user' },
-    { text: 'This document is about the history of the internet.', sender: 'assistant' },
-    { text: 'What is the purpose of this document?', sender: 'user' },
-    { text: 'The purpose of this document is to provide information about the internet. The purpose of this document is to provide information about the internet.', sender: 'assistant' },
-    { text: 'What is the main topic of this document?', sender: 'user' },
-    { text: 'The main topic of this document is the history of the internet.', sender: 'assistant' },
-    { text: 'What is the author of this document?', sender: 'user' },
-    { text: 'The author of this document is John Doe.', sender: 'assistant' },
-    { text: 'What is the publication date of this document? What is the publication date of this document? What is the publication date of this document?', sender: 'user' },
-    { text: 'The publication date of this document is 2023-01-01.', sender: 'assistant' },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -49,11 +38,27 @@ export default function Home() {
     }
   }
 
-  function handleImageSelect(event) {
+  async function handleImageSelect(event) {
     const file = event.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result.split(',')[1];
+        try {
+          const text = await detectTextInImage(base64String);
+          if (text) {
+            setMessages([...messages, { text: `There you go! Here's the text from the image:\n\n${text}`, sender: 'assistant' }]);
+          } else {
+            setMessages([...messages, { text: 'No text found in the image. You can try refreshing the page and selecting a different image.', sender: 'assistant' }]);
+          }
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   }
 
