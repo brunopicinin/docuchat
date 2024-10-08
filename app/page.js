@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getChatCompletion } from '@/lib/openai';
 import { detectTextInImage } from '@/lib/roboflow';
-import { CornerDownLeft } from "lucide-react";
+import { CornerDownLeft, MessagesSquare } from "lucide-react";
 import { useEffect, useState } from 'react';
 
 function scrollToBottom() {
@@ -66,7 +66,10 @@ export default function Home() {
     <div className="h-screen w-full">
       <div className="flex flex-col">
         <header className="sticky top-0 z-10 flex h-[53px] items-center gap-1 border-b bg-background px-4">
-          <h1 className="text-xl font-semibold">DocuChat</h1>
+          <h1 className="text-xl font-semibold flex items-center gap-1">
+            <MessagesSquare />
+            DocuChat
+          </h1>
         </header>
         <main className="w-full max-w-3xl mx-auto p-4">
           <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2">
