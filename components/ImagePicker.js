@@ -1,6 +1,20 @@
-import { Button } from '@/components/ui/button';
+'use client';
 
-export default function ImagePicker({ selectedImage, onImageSelected }) {
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+
+export default function ImagePicker({ onImageSelected }) {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  function handleChange(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      onImageSelected(file);
+    }
+  }
+
   return (
     <div className="flex items-center justify-center rounded-lg border border-dashed h-64 mb-4">
       {selectedImage ? (
@@ -23,7 +37,7 @@ export default function ImagePicker({ selectedImage, onImageSelected }) {
             id="image-input"
             type="file"
             accept="image/*"
-            onChange={onImageSelected}
+            onChange={handleChange}
             className="hidden"
           />
         </div>

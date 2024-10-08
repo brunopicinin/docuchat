@@ -11,28 +11,22 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [messages, setMessages] = useState([]);
 
-  async function handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result.split(',')[1];
-        try {
-          const text = await detectTextInImage(base64String);
-          if (text) {
-            setMessages([...messages, { role: 'assistant', content: `Here's the text from the document:\n\n${text}` }]);
-          } else {
-            setMessages([...messages, { role: 'assistant', content: 'No text found in the document. You can try refreshing the page and selecting a different image.' }]);
-          }
-        } catch (error) {
-          alert(`Error: ${error.message}`);
+  async function handleImageSelect(image) {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result.split(',')[1];
+      try {
+        const text = await detectTextInImage(base64String);
+        if (text) {
+          setMessages([...messages, { role: 'assistant', content: `Here's the text from the document:\n\n${text}` }]);
+        } else {
+          setMessages([...messages, { role: 'assistant', content: 'No text found in the document. You can try refreshing the page and selecting a different image.' }]);
         }
-      };
-      reader.readAsDataURL(file);
-    }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    };
+    reader.readAsDataURL(image);
   }
 
   async function handleSubmitMessage(text) {
@@ -48,7 +42,7 @@ export default function Home() {
         <Header />
         <main className="w-full max-w-3xl mx-auto p-4">
           <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2">
-            <ImagePicker selectedImage={selectedImage} onImageSelected={handleImageSelect} />
+            <ImagePicker onImageSelected={handleImageSelect} />
             <Chat messages={messages} onSubmitMessage={handleSubmitMessage} />
           </div>
         </main>
