@@ -18,12 +18,16 @@ export default function Chat({ status, messages, onSubmitMessage }) {
 
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      const text = input.trim();
-      if (text) {
-        setInput('');
-        onSubmitMessage(text);
-      }
+      handleFormSubmit(event);
+    }
+  }
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const text = input.trim();
+    if (text) {
+      setInput('');
+      onSubmitMessage(text);
     }
   }
 
@@ -58,7 +62,7 @@ export default function Chat({ status, messages, onSubmitMessage }) {
       <div className="flex-1" />
       {/* chat input */}
       <form
-        onSubmit={onSubmitMessage}
+        onSubmit={handleFormSubmit}
         className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring mt-6"
       >
         <Textarea
