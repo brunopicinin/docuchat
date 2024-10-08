@@ -2,14 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CornerDownLeft } from 'lucide-react';
+import { CornerDownLeft, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 function scrollToBottom() {
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-export default function Chat({ messages, onSubmitMessage }) {
+export default function Chat({ status, messages, onSubmitMessage }) {
   const [input, setInput] = useState('');
 
   useEffect(() => {
@@ -38,6 +38,21 @@ export default function Chat({ messages, onSubmitMessage }) {
             </div>
           </div>
         ))}
+        {status === 'loading:ocr' && (
+          <div className="flex justify-start pt-4">
+            <div className="flex items-center gap-2 rounded-md text-sm font-bold max-w-[80%] px-4 py-2 mt-2">
+              <LoaderCircle className="animate-spin size-4" />
+              Detecting text in the document
+            </div>
+          </div>
+        )}
+        {status === 'loading:chat' && (
+          <div className="flex justify-start pt-4">
+            <div className="flex items-center gap-2 rounded-md text-sm font-bold max-w-[80%] px-4 py-2 mt-2">
+              <span className="animate-pulse-fast">…</span>
+            </div>
+          </div>
+        )}
       </div>
       {/* spacer */}
       <div className="flex-1" />
