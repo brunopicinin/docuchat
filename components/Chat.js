@@ -12,6 +12,8 @@ function scrollToBottom() {
 export default function Chat({ status, messages, onSubmitMessage }) {
   const [input, setInput] = useState('');
 
+  const sendDisabled = status !== 'idle';
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -25,7 +27,7 @@ export default function Chat({ status, messages, onSubmitMessage }) {
   function handleFormSubmit(event) {
     event.preventDefault();
     const text = input.trim();
-    if (text) {
+    if (text && !sendDisabled) {
       setInput('');
       onSubmitMessage(text);
     }
@@ -73,7 +75,7 @@ export default function Chat({ status, messages, onSubmitMessage }) {
           onKeyDown={handleKeyDown}
         />
         <div className="flex items-center p-3 pt-0">
-          <Button type="submit" size="sm" className="ml-auto gap-1.5">
+          <Button type="submit" size="sm" className="ml-auto gap-1.5" disabled={sendDisabled}>
             Send Message
             <CornerDownLeft className="size-3.5" />
           </Button>
